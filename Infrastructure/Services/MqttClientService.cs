@@ -1,21 +1,29 @@
 ﻿using MQTTnet;
 using System.Text;
+using Domain.Interfaces;
 
-namespace Infrastructure
+namespace Infrastructure.Services
 {
-    public class MqttClient
+    public class MqttClientService : IMqttClientService, IDisposable
     {
-        private readonly IMqttClient _mqttClient;
-        private readonly MqttClientOptions _mqttClientOptions;
-        private readonly int _port = 1883;
-        
-        public MqttClient(string serverIp)
+        private readonly INetworkDiscoveryService _networkService;
+        private  IMqttClient _mqttClient;
+        private MqttClientOptions _mqttClientOptions;
+
+        public MqttClientService(INetworkDiscoveryService networkService)
         {
+            _networkService = networkService;
+        }
+
+        public async Task InitializeAsync()
+        {
+            var localIp = await _networkService.GetLocalNetworkIpAsync();
+
             var factory = new MqttClientFactory();
             _mqttClient = factory.CreateMqttClient();
 
             _mqttClientOptions = new MqttClientOptionsBuilder()
-                .WithTcpServer(serverIp, _port)
+                .WithTcpServer(localIp, 1883)
                 .WithClientId($"SmartThingsApp{Guid.NewGuid().ToString()[..5]}")
                 .Build();
 
@@ -23,20 +31,24 @@ namespace Infrastructure
             _mqttClient.DisconnectedAsync += OnDisconnected;
             _mqttClient.ApplicationMessageReceivedAsync += OnMessageRecieved;
 
-            
+
         }
 
-        public async Task Connect()
+        public event EventHandler<string> MessageReceived;
+
+        public async Task ConnectAsync()
         {
             await _mqttClient.ConnectAsync(_mqttClientOptions);
         }
 
-        public async Task Disconnect()
+        public async Task DisconnectAsync()
         {
             await _mqttClient.DisconnectAsync();
         }
 
-        public async Task Publish(string topic, string payload)
+        public void Dispose() =>  _mqttClient.Dispose();
+
+        public async Task PublishAsync(string topic, string payload)
         {
             var message = new MqttApplicationMessageBuilder()
                 .WithTopic(topic)
@@ -46,7 +58,7 @@ namespace Infrastructure
             await _mqttClient.PublishAsync(message);
         }
 
-        public async Task Subscribe(string topic)
+        public async Task SubscribeAsync(string topic)
         {
             await _mqttClient.SubscribeAsync(new MqttTopicFilterBuilder()
                 .WithTopic(topic)
@@ -69,5 +81,7 @@ namespace Infrastructure
 
             return Task.CompletedTask;
         }
+
+
     }
 }
