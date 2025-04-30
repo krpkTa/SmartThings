@@ -1,6 +1,9 @@
 ﻿using MQTTnet;
 using System.Text;
 using Domain.Interfaces;
+using Domain.Models;
+using System.Diagnostics;
+using System.Globalization;
 
 namespace Infrastructure.Services
 {
@@ -9,6 +12,9 @@ namespace Infrastructure.Services
         private readonly INetworkDiscoveryService _networkService;
         private  IMqttClient _mqttClient;
         private MqttClientOptions _mqttClientOptions;
+
+        public event EventHandler<string> MessageReceived;
+        public event EventHandler<SensorData> SensorDataReceived;
 
         public MqttClientService(INetworkDiscoveryService networkService)
         {
@@ -34,11 +40,23 @@ namespace Infrastructure.Services
 
         }
 
-        public event EventHandler<string> MessageReceived;
-
         public async Task ConnectAsync()
         {
+            if (_mqttClient.IsConnected) return;
+
             await _mqttClient.ConnectAsync(_mqttClientOptions);
+            await SubscribeToSensorTopics();
+            
+        }
+
+        private async Task SubscribeToSensorTopics()
+        {
+            await _mqttClient.SubscribeAsync("Hrodno/T");
+            Debug.WriteLine("Subscride Hrodno/T");
+            await _mqttClient.SubscribeAsync("Hrodno/H");
+            Debug.WriteLine("Subscride Hrodno/H");
+            await _mqttClient.SubscribeAsync("Hrodno/P");
+            Debug.WriteLine("Subscride Hrodno/P");
         }
 
         public async Task DisconnectAsync()
@@ -74,14 +92,61 @@ namespace Infrastructure.Services
         {
             return Task.CompletedTask;
         }
-
         private Task OnMessageRecieved(MqttApplicationMessageReceivedEventArgs args)
         {
-            var payload = Encoding.UTF8.GetString(args.ApplicationMessage.Payload);
+            try
+            {
+                var payload = Encoding.UTF8.GetString(args.ApplicationMessage.Payload);
+                Debug.WriteLine($"📨 [MQTT] Топик: {args.ApplicationMessage.Topic}, Данные: {payload}");
 
+                var sensorData = ParseSensorData(args.ApplicationMessage.Topic, payload);
+                if (sensorData != null)
+                {
+                    Debug.WriteLine($"🔄 Данные получены: T={sensorData.Temperature}, H={sensorData.Humidity}");
+                    SensorDataReceived?.Invoke(this, sensorData);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"❗ Ошибка: {ex}");
+            }
             return Task.CompletedTask;
         }
+        private SensorData? ParseSensorData(string topic, string payload)
+        {
+            try
+            {
+                payload = payload.Trim(); // Удаляем лишние символы
+                var data = new SensorData();
 
+                switch (topic)
+                {
+                    case "Hrodno/T":
+                        if (float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float temp))
+                            data.Temperature = temp;
+                        else
+                            Debug.WriteLine($"Неверный формат температуры: {payload}");
+                        break;
+
+                    case "Hrodno/H":
+                        if (float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float humidity))
+                            data.Humidity = humidity;
+                        break;
+
+                    case "Hrodno/P":
+                        if (float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float pressure))
+                            data.Pressure = pressure;
+                        break;
+                }
+
+                return data;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Ошибка в ParseSensorData: {ex.Message}");
+                return null;
+            }
+        }
 
     }
 }

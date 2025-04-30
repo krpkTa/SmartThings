@@ -71,4 +71,10 @@
 	  <!--<ProjectReference Include="..\Application\App" />-->
 	</ItemGroup>
 
+	<ItemGroup>
+	  <MauiXaml Update="Views\SensorPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
+
 </Project>

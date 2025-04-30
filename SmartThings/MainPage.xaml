@@ -7,7 +7,7 @@
         <VerticalStackLayout Padding="20" Spacing="15">
 
             <!-- Блок статуса подключения -->
-            <Frame BackgroundColor="{StaticResource SecondaryColor}">
+            <Frame BackgroundColor="Black">
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Сетевой статус:" FontAttributes="Bold"/>
                     <Label Text="{Binding ConnectionStatus}" FontSize="16"/>
@@ -20,6 +20,18 @@
                 Command="{Binding ReconnectCommand}"
                 BackgroundColor="{StaticResource PrimaryColor}"
                 TextColor="White"/>
+            <Button Text="On"
+                Command="{Binding SwitchOnCommand}"
+                    BackgroundColor="Green"></Button>
+            <Button Text="Off"
+                Command="{Binding SwitchOffCommand}"
+                    BackgroundColor="Red"></Button>
+            <Label Text="{Binding DeviceState, StringFormat='Текущее состояние: {0}'}"
+               HorizontalOptions="Center"/>
+            
+            <Button Text="Датчики" 
+        Command="{Binding NavigateToSensorsCommand}"
+        HorizontalOptions="Center"/>
 
         </VerticalStackLayout>
     </ScrollView>

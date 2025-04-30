@@ -1,4 +1,6 @@
-﻿namespace Domain.Interfaces
+﻿using Domain.Models;
+
+namespace Domain.Interfaces
 {
     public interface IMqttClientService
     {
@@ -9,5 +11,6 @@
         Task InitializeAsync();
 
         event EventHandler<string> MessageReceived;
+        event EventHandler<SensorData> SensorDataReceived;
     }
 }

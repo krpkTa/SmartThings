@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Domain.Interfaces;
 using MQTTnet.Exceptions;
+using SmartThings.Views;
 using System.Diagnostics;
 using System.Net.Sockets;
 
@@ -16,13 +18,50 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _statusMessage = "Инициализация...";
 
+    [ObservableProperty]
+    private bool _deviceState;
+
     public MainViewModel(IMqttClientService mqttService, INetworkDiscoveryService networkService)
     {
         _mqttService = mqttService;
         _networkService = networkService;
         _ = InitializeAsync(); // Запуск без ожидания
     }
-
+    [RelayCommand]
+    private async Task SwitchOn()
+    {
+        try
+        {
+            await _mqttService.PublishAsync(
+                topic: "Hrodno/LED",
+                payload: "1");
+        }
+        catch(Exception ex)
+        {
+            Debug.WriteLine($"Ошибка отправки: {ex}");
+            DeviceState = !DeviceState;
+        }
+    }
+    [RelayCommand]
+    private async Task SwitchOff()
+    {
+        try
+        {
+            await _mqttService.PublishAsync(
+                topic: "Hrodno/LED",
+                payload: "0");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Ошибка отправки: {ex}");
+            DeviceState = !DeviceState;
+        }
+    }
+    [RelayCommand]
+    private async Task NavigateToSensors()
+    {
+        await Shell.Current.GoToAsync(nameof(SensorPage));
+    }
     public async Task InitializeAsync()
     {
         if (_isInitialized) return;
@@ -68,4 +107,5 @@ public partial class MainViewModel : ObservableObject
             _ => ex.Message
         };
     }
+
 }

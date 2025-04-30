@@ -1,6 +1,8 @@
 ﻿using Domain.Interfaces;
 using Infrastructure;
 using Microsoft.Extensions.Logging;
+using SmartThings.ViewModels;
+using SmartThings.Views;
 using System.Diagnostics;
 
 namespace SmartThings
@@ -25,6 +27,8 @@ namespace SmartThings
             // Register services
             builder.Services.AddInfrastructure();
             builder.Services.AddTransient<MainViewModel>();
+            builder.Services.AddSingleton<SensorViewModel>();
+            builder.Services.AddTransient<SensorPage>();
 
             // Build the app
             var app = builder.Build();
