@@ -15,29 +15,31 @@ namespace SmartThings.ViewModels
         [ObservableProperty]
         private SensorData _currentData = new();
 
-        public SensorViewModel(IMqttClientService mqttClientService)
-        {
-            mqttClientService.SensorDataReceived += OnSensorDataReceived;
-        }
+        public SensorViewModel(IMqttClientService mqttClientService) => mqttClientService.SensorDataReceived += OnSensorDataReceived;
+
         private void OnSensorDataReceived(object sender, SensorData newData)
         {
+            Debug.WriteLine($"🔥 [ViewModel] Получены данные: T={newData.Temperature}, H={newData.Humidity}, P={newData.Pressure}");
+
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                // Создаём КОПИЮ текущих данных
-                var updatedData = new SensorData
+                CurrentData = new SensorData
                 {
-                    Temperature = CurrentData.Temperature,
-                    Humidity = CurrentData.Humidity,
-                    Pressure = CurrentData.Pressure,
+                    Temperature = newData.Temperature,
+                    Humidity = newData.Humidity,
+                    Pressure = newData.Pressure,
                     DateTime = DateTime.Now
                 };
+                // Обновляем CurrentData НАПРЯМУЮ (без создания нового объекта)
+                if (newData.Temperature != 0) CurrentData.Temperature = newData.Temperature;
+                if (newData.Humidity != 0) CurrentData.Humidity = newData.Humidity;
+                if (newData.Pressure != 0) CurrentData.Pressure = newData.Pressure;
+                CurrentData.DateTime = DateTime.Now; // Обновляем время
 
-                // Обновляем только пришедшие значения
-                if (newData.Temperature != 0) updatedData.Temperature = newData.Temperature;
-                if (newData.Humidity != 0) updatedData.Humidity = newData.Humidity;
-                if (newData.Pressure != 0) updatedData.Pressure = newData.Pressure;
+                Debug.WriteLine($"Данные: T={CurrentData.Temperature}, H={CurrentData.Humidity}, P={CurrentData.Pressure}");
 
-                CurrentData = updatedData; // Полное обновление с сохранением всех значений
+                // Форсируем обновление UI (если нужно)
+                OnPropertyChanged(nameof(CurrentData));
             });
         }
     }

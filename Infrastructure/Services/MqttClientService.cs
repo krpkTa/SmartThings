@@ -15,6 +15,7 @@ namespace Infrastructure.Services
 
         public event EventHandler<string> MessageReceived;
         public event EventHandler<SensorData> SensorDataReceived;
+        SensorData data = new SensorData();
 
         public MqttClientService(INetworkDiscoveryService networkService)
         {
@@ -40,6 +41,7 @@ namespace Infrastructure.Services
 
         }
 
+
         public async Task ConnectAsync()
         {
             if (_mqttClient.IsConnected) return;
@@ -51,11 +53,11 @@ namespace Infrastructure.Services
 
         private async Task SubscribeToSensorTopics()
         {
-            await _mqttClient.SubscribeAsync("Hrodno/T");
+            await _mqttClient.SubscribeAsync("Hrodno/ESP-D6-357E/T");
             Debug.WriteLine("Subscride Hrodno/T");
-            await _mqttClient.SubscribeAsync("Hrodno/H");
+            await _mqttClient.SubscribeAsync("Hrodno/ESP-D6-357E/H");
             Debug.WriteLine("Subscride Hrodno/H");
-            await _mqttClient.SubscribeAsync("Hrodno/P");
+            await _mqttClient.SubscribeAsync("Hrodno/ESP-D6-357E/P");
             Debug.WriteLine("Subscride Hrodno/P");
         }
 
@@ -102,7 +104,7 @@ namespace Infrastructure.Services
                 var sensorData = ParseSensorData(args.ApplicationMessage.Topic, payload);
                 if (sensorData != null)
                 {
-                    Debug.WriteLine($"🔄 Данные получены: T={sensorData.Temperature}, H={sensorData.Humidity}");
+                    Debug.WriteLine($"🔄 Данные получены: T={sensorData.Temperature}, H={sensorData.Humidity}, P={sensorData.Pressure}");
                     SensorDataReceived?.Invoke(this, sensorData);
                 }
             }
@@ -117,23 +119,23 @@ namespace Infrastructure.Services
             try
             {
                 payload = payload.Trim(); // Удаляем лишние символы
-                var data = new SensorData();
+                
 
                 switch (topic)
                 {
-                    case "Hrodno/T":
+                    case "Hrodno/ESP-D6-357E/T":
                         if (float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float temp))
                             data.Temperature = temp;
                         else
                             Debug.WriteLine($"Неверный формат температуры: {payload}");
                         break;
 
-                    case "Hrodno/H":
+                    case "Hrodno/ESP-D6-357E/H":
                         if (float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float humidity))
                             data.Humidity = humidity;
                         break;
 
-                    case "Hrodno/P":
+                    case "Hrodno/ESP-D6-357E/P":
                         if (float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float pressure))
                             data.Pressure = pressure;
                         break;

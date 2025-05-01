@@ -33,7 +33,7 @@ public partial class MainViewModel : ObservableObject
         try
         {
             await _mqttService.PublishAsync(
-                topic: "Hrodno/LED",
+                topic: "Hrodno/ESP-D6-357E/LED",
                 payload: "1");
         }
         catch(Exception ex)
@@ -48,7 +48,7 @@ public partial class MainViewModel : ObservableObject
         try
         {
             await _mqttService.PublishAsync(
-                topic: "Hrodno/LED",
+                topic: "Hrodno/ESP-D6-357E/LED",
                 payload: "0");
         }
         catch (Exception ex)

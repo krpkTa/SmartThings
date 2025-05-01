@@ -38,7 +38,7 @@ namespace SmartThings
 
             // Регистрация ViewModels и Pages
             builder.Services.AddTransient<MainViewModel>();
-            builder.Services.AddSingleton<SensorViewModel>();
+            builder.Services.AddTransient<SensorViewModel>();
             builder.Services.AddTransient<SensorPage>();
 
             return builder.Build();
