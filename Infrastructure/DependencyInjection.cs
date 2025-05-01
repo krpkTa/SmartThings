@@ -8,13 +8,19 @@ namespace Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
-            services.AddSingleton<INetworkDiscoveryService, NetworkDiscoveryService>();
-
+            // Общие сервисы (для всех платформ)
             services.AddSingleton<IMqttClientService>(provider =>
             {
                 var networkService = provider.GetRequiredService<INetworkDiscoveryService>();
                 return new MqttClientService(networkService);
             });
+
+            // Платформенно-специфичные сервисы
+#if ANDROID
+            services.AddSingleton<INetworkDiscoveryService, AndroidNetworkInfo>();
+#else
+            services.AddSingleton<INetworkDiscoveryService, NetworkDiscoveryService>();
+#endif
 
             return services;
         }

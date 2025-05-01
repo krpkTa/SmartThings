@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35728.132 d17.12
+VisualStudioVersion = 17.12.35728.132
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartThings", "SmartThings\SmartThings.csproj", "{DA0E6F07-FD01-4C74-8260-01F0B85418DD}"
 EndProject
@@ -19,6 +19,7 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{DA0E6F07-FD01-4C74-8260-01F0B85418DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DA0E6F07-FD01-4C74-8260-01F0B85418DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA0E6F07-FD01-4C74-8260-01F0B85418DD}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{DA0E6F07-FD01-4C74-8260-01F0B85418DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA0E6F07-FD01-4C74-8260-01F0B85418DD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D34BE485-9CC1-49CD-B8E8-EB677A15E7F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

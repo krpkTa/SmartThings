@@ -1,6 +1,8 @@
 ﻿using Domain.Interfaces;
 using Infrastructure;
+using Infrastructure.Services;
 using Microsoft.Extensions.Logging;
+using MQTTnet;
 using SmartThings.ViewModels;
 using SmartThings.Views;
 using System.Diagnostics;
@@ -24,30 +26,22 @@ namespace SmartThings
             builder.Logging.AddDebug();
 #endif
 
-            // Register services
+            // Правильная регистрация MQTT сервисов
+            builder.Services.AddSingleton<IMqttClient>(serviceProvider =>
+            {
+                var factory = new MqttClientFactory();
+                return factory.CreateMqttClient();
+            });
+
+            builder.Services.AddSingleton<IMqttClientService, MqttClientService>();
             builder.Services.AddInfrastructure();
+
+            // Регистрация ViewModels и Pages
             builder.Services.AddTransient<MainViewModel>();
             builder.Services.AddSingleton<SensorViewModel>();
             builder.Services.AddTransient<SensorPage>();
 
-            // Build the app
-            var app = builder.Build();
-
-            // Initialize MQTT service
-            var mqttService = app.Services.GetRequiredService<IMqttClientService>();
-            Task.Run(async () =>
-            {
-                try
-                {
-                    await mqttService.InitializeAsync();
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"MQTT initialization failed: {ex.Message}");
-                }
-            });
-
-            return app;
+            return builder.Build();
         }
     }
 }

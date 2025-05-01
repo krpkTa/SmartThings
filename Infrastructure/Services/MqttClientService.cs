@@ -29,7 +29,7 @@ namespace Infrastructure.Services
             _mqttClient = factory.CreateMqttClient();
 
             _mqttClientOptions = new MqttClientOptionsBuilder()
-                .WithTcpServer(localIp, 1883)
+                .WithTcpServer("192.168.242.119", 1883)
                 .WithClientId($"SmartThingsApp{Guid.NewGuid().ToString()[..5]}")
                 .Build();
 
