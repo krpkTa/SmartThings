@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Domain.Interfaces;
+using Microsoft.Maui.Controls;
 using MQTTnet.Exceptions;
 using SmartThings.Views;
 using System.Diagnostics;
@@ -58,8 +59,14 @@ public partial class MainViewModel : ObservableObject
         }
     }
     [RelayCommand]
-    private async Task NavigateToSensors()
+    private async Task NavigateToSensors(Frame frame)
     {
+        if (frame != null)
+        {
+            await frame.ScaleTo(0.95, 100, Easing.CubicOut);
+            await frame.ScaleTo(1, 100, Easing.CubicIn);
+        }
+
         await Shell.Current.GoToAsync(nameof(SensorPage));
     }
     public async Task InitializeAsync()

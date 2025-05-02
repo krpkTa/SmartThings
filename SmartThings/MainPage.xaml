@@ -1,39 +1,282 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="SmartThings.MainPage">
+             x:Class="SmartThings.MainPage"
+             BackgroundColor="#f9f6f2">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="15">
+        <VerticalStackLayout HorizontalOptions="Center" Padding="20" Spacing="15">
+            <!-- Welcome Header -->
+            <Label Text="Welcome" 
+                   HorizontalOptions="Start"
+                   Margin="30,20,0,0"
+                   TextColor="Black"
+                   FontSize="24"/>
 
-            <!-- Блок статуса подключения -->
-            <Frame BackgroundColor="Black">
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Сетевой статус:" FontAttributes="Bold"/>
-                    <Label Text="{Binding ConnectionStatus}" FontSize="16"/>
-                    <Label Text="{Binding LocalIpAddress}" FontSize="14"/>
-                </VerticalStackLayout>
-            </Frame>
+            <!-- Horizontal container for buttons -->
+            <HorizontalStackLayout Spacing="20" HorizontalOptions="Start" Margin="10,10,0,0">
+                
+                <!-- First Button Card -->
+                <Frame BorderColor="#476f95"
+                       CornerRadius="20"
+                       HeightRequest="93"
+                       WidthRequest="150"
+                       HasShadow="True"
+                       BackgroundColor="Transparent"
+                       Padding="0">
+                    <Frame.Shadow>
+                        <Shadow Brush="Black"
+                                Offset="3,3"
+                                Radius="10"
+                                Opacity="0.4">
+                        </Shadow>
+                        
+                    </Frame.Shadow>
 
-            <!-- Кнопка обновления -->
-            <Button Text="Обновить IP" 
-                Command="{Binding ReconnectCommand}"
-                BackgroundColor="{StaticResource PrimaryColor}"
-                TextColor="White"/>
-            <Button Text="On"
-                Command="{Binding SwitchOnCommand}"
-                    BackgroundColor="Green"></Button>
-            <Button Text="Off"
-                Command="{Binding SwitchOffCommand}"
-                    BackgroundColor="Red"></Button>
-            <Label Text="{Binding DeviceState, StringFormat='Текущее состояние: {0}'}"
-               HorizontalOptions="Center"/>
-            
-            <Button Text="Датчики" 
-        Command="{Binding NavigateToSensorsCommand}"
-        HorizontalOptions="Center"/>
+                    <Grid>
+                        
+                        <!-- Background -->
+                        <Frame CornerRadius="20"
+                               BorderColor="Transparent"
+                               BackgroundColor="#d1dbe4"
+                               HasShadow="False"/>
+                        
+                        <!-- Content -->
+                        <HorizontalStackLayout Spacing="5" VerticalOptions="Center" Padding="0,0,0,0">
+                            <!-- Icon -->
+                            <Image Source="widget.png"
+                                   HeightRequest="31"
+                                   WidthRequest="34"
+                                   VerticalOptions="Center"/>
+                            
+                            <!-- Text -->
+                            <Label Text="All Devices"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                        <Button
+                            BorderColor="#d9a7b0"
+                            BackgroundColor="Transparent"
+                                Command="{Binding NavigateToSensorsCommand}"></Button>
+                    </Grid>
+                </Frame>
 
+                <!-- Second Button Card -->
+                <Frame BorderColor="#476f95"
+                       CornerRadius="20"
+                       HeightRequest="93"
+                       WidthRequest="150"
+                       HasShadow="True"
+                       BackgroundColor="Transparent"
+                       Padding="0">
+
+                    <Frame.Shadow>
+                        <Shadow Brush="Black"
+            Offset="3,3"
+            Radius="10"
+            Opacity="0.4">
+                        </Shadow>
+
+                    </Frame.Shadow>
+
+                    <Grid>
+                        <!-- Background -->
+                        <Frame CornerRadius="20"
+                               BorderColor="Transparent"
+                               BackgroundColor="#d1dbe4"
+                               HasShadow="False"/>
+                        
+                        <!-- Content -->
+                        <HorizontalStackLayout Spacing="10" VerticalOptions="Center" Padding="15,0,0,0">
+                            <!-- Icon -->
+                            <Image Source="add.png"
+                                   HeightRequest="31"
+                                   WidthRequest="34"
+                                   VerticalOptions="Center"
+                                   Margin="-9,0,0,0"/>
+                            
+                            <!-- Text -->
+                            <Label Text="Add new"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center"
+                                   Margin="-2,0,0,0"/>
+                        </HorizontalStackLayout>
+                        <Button
+                            BackgroundColor="Transparent"
+                            Command="{Binding NavigateToSensorsCommand}"></Button>
+                    </Grid>
+                </Frame>
+                
+            </HorizontalStackLayout>
+            <BoxView Color="#476f95" 
+                    HeightRequest="1" 
+                    Margin="-10,0,-10,0"
+                    HorizontalOptions="Fill"/>
+            <Label Text="Sensor Data" TextColor="Black" HorizontalOptions="Center" 
+                   FontSize="20" FontAttributes="Bold"></Label>
+            <BoxView Color="#476f95" 
+                    HeightRequest="1" 
+                    Margin="-10,0,-10,0"
+                    HorizontalOptions="Fill"/>
+
+
+            <VerticalStackLayout Spacing="20" HorizontalOptions="Center" Margin="10,10,0,0">
+                
+                <!--Temperarure-->
+                
+                <Frame BorderColor="#476f95"
+                        CornerRadius="20"
+                        HeightRequest="110"
+                        WidthRequest="320"
+                        HasShadow="True"
+                        BackgroundColor="Transparent"
+                        Padding="0">
+
+                    <Frame.Shadow>
+                        <Shadow Brush="Black"
+                                Offset="3,3"
+                                Radius="10"
+                                Opacity="0.4">
+                        </Shadow>
+
+                    </Frame.Shadow>
+
+                    <Grid>
+                        <!-- Background -->
+                        <Frame CornerRadius="20"
+                                BorderColor="Transparent"
+                                BackgroundColor="#d1dbe4"
+                                HasShadow="False"/>
+
+                        <!-- Content -->
+                        <HorizontalStackLayout Spacing="10" VerticalOptions="Center" Padding="15,0,0,0">
+                            
+                            <Image Source="temperature.png"
+                                    HeightRequest="50"
+                                    WidthRequest="50"
+                                    VerticalOptions="Center"
+                                    Margin="-9,0,0,0"/>
+
+                            <!-- Text -->
+                            <Label Text="Temperature"
+                                    FontSize="20"
+                                    FontAttributes="Bold"
+                                    VerticalOptions="Center"
+                                    Margin="-2,0,0,0"/>
+                            
+                            <Image Source="info.png"
+                                    HeightRequest="20"
+                                    WidthRequest="20"
+                                    VerticalOptions="Center"
+                                    Margin="87,0,0,0"/>
+                            
+                        </HorizontalStackLayout>
+                        <Button BackgroundColor="Transparent"
+                                Command="{Binding NavigateToSensorsCommand}"></Button>
+                    </Grid>
+                </Frame>
+
+                <Frame BorderColor="#476f95"
+                        CornerRadius="20"
+                        HeightRequest="110"
+                        WidthRequest="320"
+                        HasShadow="True"
+                        BackgroundColor="Transparent"
+                        Padding="0">
+
+                    <Frame.Shadow>
+                        <Shadow Brush="Black"
+                                Offset="3,3"
+                                Radius="10"
+                                Opacity="0.4">
+                        </Shadow>
+
+                    </Frame.Shadow>
+
+                    <Grid>
+                        <!-- Background -->
+                        <Frame CornerRadius="20"
+                                BorderColor="Transparent"
+                                BackgroundColor="#d1dbe4"
+                                HasShadow="False"/>
+
+                        <!-- Content -->
+                        <HorizontalStackLayout Spacing="10" VerticalOptions="Center" Padding="15,0,0,0">
+                            <Image Source="humidity.png"
+                                    HeightRequest="50"
+                                    WidthRequest="50"
+                                    VerticalOptions="Center"
+                                    Margin="-9,0,0,0"/>
+
+                            <!-- Text -->
+                            <Label Text="Humidity"
+                                    FontSize="20"
+                                    FontAttributes="Bold"
+                                    VerticalOptions="Center"
+                                    Margin="-2,0,0,0"/>
+                            <Image Source="info.png"
+                                    HeightRequest="20"
+                                    WidthRequest="20"
+                                    VerticalOptions="Center"
+                                    Margin="125,0,0,0"/>
+                        </HorizontalStackLayout>
+                        <Button BackgroundColor="Transparent"
+                                Command="{Binding NavigateToSensorsCommand}"></Button>
+                    </Grid>
+                </Frame>
+
+                <Frame BorderColor="#476f95"
+                        CornerRadius="20"
+                        HeightRequest="110"
+                        WidthRequest="320"
+                        HasShadow="True"
+                        BackgroundColor="Transparent"
+                        Padding="0">
+
+                    <Frame.Shadow>
+                        <Shadow Brush="Black"
+                                Offset="3,3"
+                                Radius="10"
+                                Opacity="0.4">
+                        </Shadow>
+
+                    </Frame.Shadow>
+
+                    <Grid>
+                        <!-- Background -->
+                        <Frame CornerRadius="20"
+                                BorderColor="Transparent"
+                                BackgroundColor="#d1dbe4"
+                                HasShadow="False"/>
+
+                        <!-- Content -->
+                        <HorizontalStackLayout Spacing="10" VerticalOptions="Center" Padding="15,0,0,0">
+                            <Image Source="gauge.png"
+                                    HeightRequest="50"
+                                    WidthRequest="50"
+                                    VerticalOptions="Center"
+                                    Margin="-9,0,0,0"/>
+
+                            <!-- Text -->
+                            <Label Text="Pressure"
+                                    FontSize="20"
+                                    FontAttributes="Bold"
+                                    VerticalOptions="Center"
+                                    Margin="-2,0,0,0"/>
+                            <Image Source="info.png"
+                                    HeightRequest="20"
+                                    WidthRequest="20"
+                                    VerticalOptions="Center"
+                                    Margin="125,0,0,0"/>
+                        </HorizontalStackLayout>
+                        <Button BackgroundColor="Transparent"
+                                Command="{Binding NavigateToSensorsCommand}"></Button>
+                    </Grid>
+                </Frame>
+
+            </VerticalStackLayout>
         </VerticalStackLayout>
     </ScrollView>
-
 </ContentPage>

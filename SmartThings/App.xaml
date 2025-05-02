@@ -14,6 +14,14 @@
                 <converters:BoolToTextConverter x:Key="BoolToTextConverter"/>
                 <converters:BoolToColorConverter x:Key="BoolToColorConverter"/>
             </ResourceDictionary>
+            <ResourceDictionary>
+                <Style TargetType="NavigationPage">
+                    <Setter Property="BarBackgroundColor" Value="#f9f6f2" />
+                    <!-- Цвет фона -->
+                    <Setter Property="BarTextColor" Value="Black" />
+                    <!-- Цвет текста -->
+                </Style>
+            </ResourceDictionary>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
