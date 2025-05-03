@@ -63,6 +63,7 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
 		<PackageReference Include="MQTTnet" Version="5.0.1.1416" />
+		<PackageReference Include="Prism.Wpf" Version="9.0.537" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -75,6 +76,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Views\AddDevicePage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\AllDevices.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\SensorPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

@@ -58,7 +58,7 @@
                         <Button
                             BorderColor="#d9a7b0"
                             BackgroundColor="Transparent"
-                                Command="{Binding NavigateToSensorsCommand}"></Button>
+                                Command="{Binding NavigateToAllDeviceCommand}"></Button>
                     </Grid>
                 </Frame>
 
@@ -88,7 +88,7 @@
                                HasShadow="False"/>
                         
                         <!-- Content -->
-                        <HorizontalStackLayout Spacing="10" VerticalOptions="Center" Padding="15,0,0,0">
+                        <HorizontalStackLayout Spacing="10" VerticalOptions="Center" Padding="9,0,0,0">
                             <!-- Icon -->
                             <Image Source="add.png"
                                    HeightRequest="31"
@@ -105,7 +105,7 @@
                         </HorizontalStackLayout>
                         <Button
                             BackgroundColor="Transparent"
-                            Command="{Binding NavigateToSensorsCommand}"></Button>
+                            Command="{Binding NavigateToAddDeviceCommand}"></Button>
                     </Grid>
                 </Frame>
                 
@@ -122,14 +122,14 @@
                     HorizontalOptions="Fill"/>
 
 
-            <VerticalStackLayout Spacing="20" HorizontalOptions="Center" Margin="10,10,0,0">
+            <HorizontalStackLayout Spacing="10" HorizontalOptions="Center" Margin="-2,0,0,0">
                 
                 <!--Temperarure-->
                 
                 <Frame BorderColor="#476f95"
                         CornerRadius="20"
                         HeightRequest="110"
-                        WidthRequest="320"
+                        WidthRequest="110"
                         HasShadow="True"
                         BackgroundColor="Transparent"
                         Padding="0">
@@ -160,17 +160,17 @@
                                     Margin="-9,0,0,0"/>
 
                             <!-- Text -->
-                            <Label Text="Temperature"
+                            <!--<Label Text="Temperature"
                                     FontSize="20"
                                     FontAttributes="Bold"
                                     VerticalOptions="Center"
-                                    Margin="-2,0,0,0"/>
+                                    Margin="-2,0,0,0"/>-->
                             
                             <Image Source="info.png"
                                     HeightRequest="20"
                                     WidthRequest="20"
                                     VerticalOptions="Center"
-                                    Margin="87,0,0,0"/>
+                                    Margin="0,0,0,0"/>
                             
                         </HorizontalStackLayout>
                         <Button BackgroundColor="Transparent"
@@ -181,7 +181,7 @@
                 <Frame BorderColor="#476f95"
                         CornerRadius="20"
                         HeightRequest="110"
-                        WidthRequest="320"
+                        WidthRequest="110"
                         HasShadow="True"
                         BackgroundColor="Transparent"
                         Padding="0">
@@ -211,16 +211,16 @@
                                     Margin="-9,0,0,0"/>
 
                             <!-- Text -->
-                            <Label Text="Humidity"
+                            <!--<Label Text="Humidity"
                                     FontSize="20"
                                     FontAttributes="Bold"
                                     VerticalOptions="Center"
-                                    Margin="-2,0,0,0"/>
+                                    Margin="-2,0,0,0"/>-->
                             <Image Source="info.png"
                                     HeightRequest="20"
                                     WidthRequest="20"
                                     VerticalOptions="Center"
-                                    Margin="125,0,0,0"/>
+                                    Margin="10,0,0,0"/>
                         </HorizontalStackLayout>
                         <Button BackgroundColor="Transparent"
                                 Command="{Binding NavigateToSensorsCommand}"></Button>
@@ -230,7 +230,7 @@
                 <Frame BorderColor="#476f95"
                         CornerRadius="20"
                         HeightRequest="110"
-                        WidthRequest="320"
+                        WidthRequest="110"
                         HasShadow="True"
                         BackgroundColor="Transparent"
                         Padding="0">
@@ -260,23 +260,23 @@
                                     Margin="-9,0,0,0"/>
 
                             <!-- Text -->
-                            <Label Text="Pressure"
+                            <!--<Label Text="Pressure"
                                     FontSize="20"
                                     FontAttributes="Bold"
                                     VerticalOptions="Center"
-                                    Margin="-2,0,0,0"/>
+                                    Margin="-2,0,0,0"/>-->
                             <Image Source="info.png"
                                     HeightRequest="20"
                                     WidthRequest="20"
                                     VerticalOptions="Center"
-                                    Margin="125,0,0,0"/>
+                                    Margin="10,0,0,0"/>
                         </HorizontalStackLayout>
                         <Button BackgroundColor="Transparent"
                                 Command="{Binding NavigateToSensorsCommand}"></Button>
                     </Grid>
                 </Frame>
 
-            </VerticalStackLayout>
+            </HorizontalStackLayout>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

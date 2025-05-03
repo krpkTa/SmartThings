@@ -8,6 +8,8 @@ namespace SmartThings
         {
             InitializeComponent();
             Routing.RegisterRoute(nameof(SensorPage), typeof(SensorPage));
+            Routing.RegisterRoute(nameof(AddDevicePage), typeof(AddDevicePage));
+            Routing.RegisterRoute(nameof(AllDevices), typeof(AllDevices));
         }
     }
 }

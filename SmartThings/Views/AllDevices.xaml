@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SmartThings.Presentation.ViewModels"
+             xmlns:model="clr-namespace:Domain.Models;assembly=Domain"
+             x:Class="SmartThings.Views.AllDevices"
+             Title="My Devices"
+             x:DataType="vm:AllDevicesViewModel"
+             BackgroundColor="#f9f6f2">
+
+    <Grid>
+        <!-- Основной контент -->
+        <RefreshView IsRefreshing="{Binding IsRefreshing}"
+                     Command="{Binding LoadDevicesCommand}">
+            <CollectionView ItemsSource="{Binding Devices}"
+                            SelectionMode="None"
+                            EmptyView="No devices found">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="model:SmartDevice">
+                        <Frame Padding="10" 
+                               Margin="10"
+                               BorderColor="#476f95"
+                               BackgroundColor="#d1dbe4"
+                               CornerRadius="20">
+                            <Frame.Shadow>
+                                <Shadow Brush="Black"
+                                        Offset="3,3"
+                                        Radius="10"
+                                        Opacity="0.4">
+                                </Shadow>
+
+                            </Frame.Shadow>
+                            <Grid>
+                                <VerticalStackLayout Grid.Column="0">
+                                    <Label Text="{Binding Name}" 
+                                           FontSize="18"
+                                           FontAttributes="Bold"/>
+                                    <Label Text="{Binding Uid}" 
+                                           TextColor="#476f95"
+                                           FontSize="14"/>
+                                    <Label Text="{Binding Topic}" 
+                                           FontSize="12"
+                                           TextColor="#666"/>
+                                </VerticalStackLayout>
+
+                                <!-- Кнопка удаления -->
+                                <Button Margin="290,0,0,0"
+                                        Text="×"
+                                        TextColor="Red"
+                                        FontSize="20"
+                                        BackgroundColor="Transparent"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AllDevicesViewModel}}, 
+                                                         Path=DeleteDeviceCommand}"
+                                        CommandParameter="{Binding}"
+                                        WidthRequest="50"
+                                        HeightRequest="50"/>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+        <!-- Кнопка добавления -->
+        <Button Text="+ Add Device"
+                Command="{Binding NavigateToAddDeviceCommand}"
+                BackgroundColor="#476f95"
+                TextColor="White"
+                CornerRadius="20"
+                WidthRequest="150"
+                HeightRequest="50"
+                Margin="0,0,0,20"
+                HorizontalOptions="Center"
+                VerticalOptions="End"/>
+    </Grid>
+</ContentPage>

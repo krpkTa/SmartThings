@@ -69,6 +69,28 @@ public partial class MainViewModel : ObservableObject
 
         await Shell.Current.GoToAsync(nameof(SensorPage));
     }
+    [RelayCommand]
+    private async Task NavigateToAddDevice(Frame frame)
+    {
+        if (frame != null)
+        {
+            await frame.ScaleTo(0.95, 100, Easing.CubicOut);
+            await frame.ScaleTo(1, 100, Easing.CubicIn);
+        }
+
+        await Shell.Current.GoToAsync(nameof(AddDevicePage));
+    }
+    [RelayCommand]
+    private async Task NavigateToAllDevice(Frame frame)
+    {
+        if (frame != null)
+        {
+            await frame.ScaleTo(0.95, 100, Easing.CubicOut);
+            await frame.ScaleTo(1, 100, Easing.CubicIn);
+        }
+
+        await Shell.Current.GoToAsync(nameof(AllDevices));
+    }
     public async Task InitializeAsync()
     {
         if (_isInitialized) return;

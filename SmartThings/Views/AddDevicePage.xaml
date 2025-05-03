@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartThings.Views.AddDevicePage"
+             Title="AddDevicePage"
+             BackgroundColor="#f9f6f2">
+    <VerticalStackLayout Spacing="20" Padding="20">
+        <!-- Заголовок -->
+        <Label Text="Add new device"
+               VerticalOptions="Center"
+               HorizontalOptions="Center"
+               TextColor="Black"
+               FontSize="18"
+               FontAttributes="Bold"/>
+
+        <!-- Горизонтальная строка с Label и Entry -->
+        <HorizontalStackLayout HorizontalOptions="Center" Spacing="10" VerticalOptions="Center">
+            <Label Text="Name:" 
+                   TextColor="Black"
+                   VerticalOptions="Center"
+                   FontSize="16"
+                   Margin="-50,0,0,0"/>
+
+            <Entry Placeholder="Enter device name"
+                   Text="{Binding Name}"
+                   WidthRequest="150"
+                   HorizontalOptions="FillAndExpand"
+                   BackgroundColor="White"
+                   TextColor="Black"/>
+        </HorizontalStackLayout>
+        <HorizontalStackLayout HorizontalOptions="Center" Spacing="16" VerticalOptions="Center">
+            <Label Text="UID:" 
+                   TextColor="Black"
+                   VerticalOptions="Center"
+                   FontSize="16"
+                   Margin="-40,0,0,0"/>
+
+            <Entry Placeholder="Enter device UID"
+                   WidthRequest="150"
+                   Text="{Binding Uid}"
+                   HorizontalOptions="FillAndExpand"
+                   BackgroundColor="White"
+                   TextColor="Black"/>
+        </HorizontalStackLayout>
+        <Button HorizontalOptions="Center"
+                Text="Add"
+                Background="#476f95"
+                TextColor="White"
+                HeightRequest="40"
+                WidthRequest="80"
+                Margin="0,0,0,0"
+                Command="{Binding AddNewDeviceCommand}"></Button>
+    </VerticalStackLayout>
+</ContentPage>

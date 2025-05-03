@@ -30,7 +30,7 @@ namespace Infrastructure.Services
             _mqttClient = factory.CreateMqttClient();
 
             _mqttClientOptions = new MqttClientOptionsBuilder()
-                .WithTcpServer("192.168.242.119", 1883)
+                .WithTcpServer("192.168.290.119", 1883) //          Испльзуем DuckDNS вместо IP
                 .WithClientId($"SmartThingsApp{Guid.NewGuid().ToString()[..5]}")
                 .Build();
 
