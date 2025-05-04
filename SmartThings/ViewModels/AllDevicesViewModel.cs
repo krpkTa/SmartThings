@@ -32,7 +32,7 @@ public partial class AllDevicesViewModel : ObservableObject
         try
         {
             IsRefreshing = true;
-            var devices = await _deviceService.GetAllDevicesAsync();
+            var devices = await _deviceService.LoadDevicesAsync();
             Devices = new ObservableCollection<SmartDevice>(devices);
         }
         finally

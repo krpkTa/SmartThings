@@ -40,8 +40,8 @@ namespace SmartThings
             builder.Services.AddSingleton<IMqttClientService, MqttClientService>();
             builder.Services.AddInfrastructure();
 
-            builder.Services.AddScoped<IDeviceRepository, DeviceRepository>()
-                .AddScoped<IDeviceService, DeviceService>();
+            builder.Services.AddSingleton<IDeviceRepository, DeviceRepository>();
+            builder.Services.AddSingleton<IDeviceService, DeviceService>();
 
             // Регистрация ViewModels и Pages
             builder.Services.AddTransient<MainViewModel>();
@@ -50,6 +50,9 @@ namespace SmartThings
             builder.Services.AddTransient<AllDevicesViewModel>();
             builder.Services.AddTransient<AllDevices>();
             builder.Services.AddTransient<SensorPage>();
+            builder.Services.AddTransient<Temperature>();
+            builder.Services.AddTransient<Pressure>();
+            builder.Services.AddTransient<Humidity>();
             builder.Services.AddTransient<AddDevicePage>();
 
             return builder.Build();

@@ -13,5 +13,7 @@ namespace Domain.Interfaces
         Task<IEnumerable<SmartDevice>> GetAllAsync();
         Task<SmartDevice?> GetByIdAsync(Guid id);
         Task DeleteAsync(SmartDevice device);
+        Task<List<SmartDevice>> LoadDevicesAsync();
+        Task InitializeAsync();
     }
 }

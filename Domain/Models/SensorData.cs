@@ -5,33 +5,40 @@ namespace Domain.Models
 {
     public partial class SensorData : ObservableObject // или INotifyPropertyChanged
 {
-    private float _temperature;
-    private float _humidity;
-    private float _pressure;
+    private float? _temperature;
+    private float? _humidity;
+    private float? _pressure;
     private DateTime _dateTime;
+    private string _deviceUID;
 
-    public float Temperature
-    {
-        get => _temperature;
-        set => SetProperty(ref _temperature, value);
-    }
+    public string DeviceUID
+            {
+                get { return _deviceUID; }
+                set { _deviceUID = value; }
+            }
+        public float? Temperature { get; set; }  // Добавлен знак вопроса для nullable
+        public float? Humidity { get; set; }     // Добавлен знак вопроса для nullable
+        public float? Pressure { get; set; }
 
-    public float Humidity
-    {
-        get => _humidity;
-        set => SetProperty(ref _humidity, value);
-    }
-
-    public float Pressure
-    {
-        get => _pressure;
-        set => SetProperty(ref _pressure, value);
-    }
-
-    public DateTime DateTime
+        public DateTime DateTime
     {
         get => _dateTime;
         set => SetProperty(ref _dateTime, value);
     }
-}
+        public SensorData Clone()
+        {
+            return new SensorData
+            {
+                DeviceUID = this.DeviceUID,
+                Temperature = this.Temperature,
+                Humidity = this.Humidity,
+                Pressure = this.Pressure,
+                DateTime = this.DateTime
+            };
+        }
+        public bool IsValid()
+        {
+            return Temperature.HasValue || Humidity.HasValue || Pressure.HasValue;
+        }
+    }
 }
