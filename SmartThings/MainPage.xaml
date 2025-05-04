@@ -174,7 +174,7 @@
                             
                         </HorizontalStackLayout>
                         <Button BackgroundColor="Transparent"
-                                Command="{Binding NavigateToSensorsCommand}"></Button>
+                                Command="{Binding NavigateToTemperatureCommand}"></Button>
                     </Grid>
                 </Frame>
 
@@ -223,7 +223,7 @@
                                     Margin="10,0,0,0"/>
                         </HorizontalStackLayout>
                         <Button BackgroundColor="Transparent"
-                                Command="{Binding NavigateToSensorsCommand}"></Button>
+                                Command="{Binding NavigateToHumidityCommand}"></Button>
                     </Grid>
                 </Frame>
 
@@ -272,7 +272,7 @@
                                     Margin="10,0,0,0"/>
                         </HorizontalStackLayout>
                         <Button BackgroundColor="Transparent"
-                                Command="{Binding NavigateToSensorsCommand}"></Button>
+                                Command="{Binding NavigateToPressureCommand}"></Button>
                     </Grid>
                 </Frame>
 

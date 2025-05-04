@@ -4,6 +4,7 @@ namespace Domain.Interfaces
 {
     public interface IMqttClientService
     {
+        bool IsConnected { get; }
         Task ConnectAsync();
         Task DisconnectAsync();
         Task PublishAsync(string topic, string payload);
@@ -12,6 +13,8 @@ namespace Domain.Interfaces
         Task SubscribeToDeviceAsync(SmartDevice device);
         Task UnsubscribeFromDeviceAsync(string deviceUid);
 
+        event EventHandler Connected; // Добавляем событие
+        event EventHandler Disconnected;
         event EventHandler<string> MessageReceived;
         event EventHandler<SensorData> SensorDataReceived;
     }

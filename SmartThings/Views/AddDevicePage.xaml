@@ -41,7 +41,29 @@
                    HorizontalOptions="FillAndExpand"
                    BackgroundColor="White"
                    TextColor="Black"/>
+            
         </HorizontalStackLayout>
+        <HorizontalStackLayout HorizontalOptions="Center" Spacing="12" VerticalOptions="Center">
+            <Label Text="Topics:" 
+           TextColor="Black"
+           VerticalOptions="Center"
+           FontSize="16"
+           Margin="-53,0,0,0"/>
+
+            <Entry Placeholder="Enter topics"
+           WidthRequest="150"
+           Text="{Binding DeviceTopics}"
+           HorizontalOptions="FillAndExpand"
+           BackgroundColor="White"
+           TextColor="Black"/>
+
+        </HorizontalStackLayout>
+        <Label Margin="0,-13,0,0"
+                TextColor="Gray" 
+               HorizontalOptions="Center" 
+               FontSize="12"
+               FontAttributes="Bold"
+               Text="ex.: LED, T, P, H"></Label>
         <Button HorizontalOptions="Center"
                 Text="Add"
                 Background="#476f95"

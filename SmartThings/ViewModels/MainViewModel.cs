@@ -12,8 +12,6 @@ using System.Net.Sockets;
 public partial class MainViewModel : ObservableObject
 {
     private readonly IMqttClientService _mqttService;
-    private readonly INetworkDiscoveryService _networkService;
-    
     private bool _isInitialized = false;
 
     [ObservableProperty]
@@ -25,10 +23,9 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool _deviceState;
 
-    public MainViewModel(IMqttClientService mqttService, INetworkDiscoveryService networkService)
+    public MainViewModel(IMqttClientService mqttService)
     {
         _mqttService = mqttService;
-        _networkService = networkService;
         _ = InitializeAsync(); // Запуск без ожидания
     }
     [RelayCommand]
@@ -40,7 +37,7 @@ public partial class MainViewModel : ObservableObject
                 topic: "Hrodno/ESP-D6-357E/LED",
                 payload: "1");
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Debug.WriteLine($"Ошибка отправки: {ex}");
             DeviceState = !DeviceState;
@@ -84,6 +81,39 @@ public partial class MainViewModel : ObservableObject
         await Shell.Current.GoToAsync(nameof(AddDevicePage));
     }
     [RelayCommand]
+    private async Task NavigateToTemperature(Frame frame)
+    {
+        if (frame != null)
+        {
+            await frame.ScaleTo(0.95, 100, Easing.CubicOut);
+            await frame.ScaleTo(1, 100, Easing.CubicIn);
+        }
+
+        await Shell.Current.GoToAsync(nameof(Temperature));
+    }
+    [RelayCommand]
+    private async Task NavigateToPressure(Frame frame)
+    {
+        if (frame != null)
+        {
+            await frame.ScaleTo(0.95, 100, Easing.CubicOut);
+            await frame.ScaleTo(1, 100, Easing.CubicIn);
+        }
+
+        await Shell.Current.GoToAsync(nameof(Pressure));
+    }
+    [RelayCommand]
+    private async Task NavigateToHumidity(Frame frame)
+    {
+        if (frame != null)
+        {
+            await frame.ScaleTo(0.95, 100, Easing.CubicOut);
+            await frame.ScaleTo(1, 100, Easing.CubicIn);
+        }
+
+        await Shell.Current.GoToAsync(nameof(Humidity));
+    }
+    [RelayCommand]
     private async Task NavigateToAllDevice(Frame frame)
     {
         if (frame != null)
@@ -100,16 +130,9 @@ public partial class MainViewModel : ObservableObject
 
         try
         {
-            Debug.WriteLine("Этап 1: Получение IP");
-            var ip = await _networkService.GetLocalNetworkIpAsync().ConfigureAwait(false);
+            
 
-            MainThread.BeginInvokeOnMainThread(() =>
-            {
-                LocalIpAddress = ip;
-                StatusMessage = "IP получен, подключение...";
-            });
-
-            Debug.WriteLine($"Этап 2: Подключение MQTT с IP: {ip}");
+            Debug.WriteLine($"Этап 2: Подключение MQTT");
             await _mqttService.ConnectAsync().ConfigureAwait(false);
             await _mqttService.SubscribeAsync("home/status").ConfigureAwait(false);
 

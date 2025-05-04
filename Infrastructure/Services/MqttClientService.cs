@@ -1,93 +1,118 @@
 ﻿using MQTTnet;
-using System.Text;
 using Domain.Interfaces;
 using Domain.Models;
 using System.Diagnostics;
+using System.Text;
 using System.Globalization;
 using System.Collections.Concurrent;
 
 namespace Infrastructure.Services
 {
-    public class MqttClientService : IMqttClientService, IDisposable
+    public class MqttClientService : IMqttClientService
     {
-        private  IMqttClient _mqttClient;
+        private readonly INetworkDiscoveryService _networkService;
+        private IMqttClient _mqttClient;
         private MqttClientOptions _mqttClientOptions;
         private readonly ConcurrentDictionary<string, SmartDevice> _devices = new ConcurrentDictionary<string, SmartDevice>();
         private bool _isInitialized;
 
+        public bool IsConnected => _mqttClient?.IsConnected ?? false;
+        private readonly Dictionary<string, SensorData> _lastValues = new();
+
+        public event EventHandler<SensorData> SensorDataUpdated;
         public event EventHandler<string> MessageReceived;
         public event EventHandler<SensorData> SensorDataReceived;
-        SensorData data = new SensorData();
+        public event EventHandler Connected;
+        public event EventHandler Disconnected;
 
         public async Task InitializeAsync()
         {
-            if (_isInitialized) return;
+            try
+            {
+                var localIp = await _networkService.GetLocalNetworkIpAsync();
+                Debug.WriteLine($"Initializing MQTT with local IP: {localIp}");
 
-            var factory = new MqttClientFactory();
-            _mqttClient = factory.CreateMqttClient();
+                var factory = new MqttClientFactory();
+                _mqttClient = factory.CreateMqttClient();
 
-            _mqttClientOptions = new MqttClientOptionsBuilder()
-                .WithTcpServer("192.168.242.119", 1883)
-                .WithClientId($"SmartThingsApp{Guid.NewGuid().ToString()[..5]}")
-                .Build();
+                _mqttClientOptions = new MqttClientOptionsBuilder()
+                    .WithTcpServer("192.168.242.119", 1883)
+                    .WithClientId($"SmartThingsApp_{Guid.NewGuid().ToString()[..5]}")
+                    .Build();
 
-            _mqttClient.ConnectedAsync += OnConnected;
-            _mqttClient.DisconnectedAsync += OnDisconnected;
-            _mqttClient.ApplicationMessageReceivedAsync += OnMessageRecieved;
-
-            //try
-            //{
-            //    await _mqttClient.ConnectAsync(_mqttClientOptions);
-            //    _isInitialized = true;
-
-            //}
-            //catch (Exception ex)
-            //{
-            //    Debug.WriteLine($"Initialization failed: {ex.Message}");
-
-            //}
-
+                SetupEventHandlers();
+                await ConnectWithRetryAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MQTT Initialization failed: {ex}");
+                throw;
+            }
         }
 
+        private void SetupEventHandlers()
+        {
+            _mqttClient.ConnectedAsync += async e =>
+            {
+                Connected?.Invoke(this, EventArgs.Empty);
+                await Task.CompletedTask;
+            };
+
+            _mqttClient.DisconnectedAsync += async e =>
+            {
+                Disconnected?.Invoke(this, EventArgs.Empty);
+                await Task.CompletedTask;
+            };
+
+            _mqttClient.ApplicationMessageReceivedAsync += OnMessageReceivedAsync;
+        }
+
+        private async Task TryReconnectAsync()
+        {
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(5));
+                await ConnectWithRetryAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Reconnect failed: {ex}");
+            }
+        }
+
+        private async Task ConnectWithRetryAsync(int maxAttempts = 3)
+        {
+            for (int attempt = 1; attempt <= maxAttempts; attempt++)
+            {
+                try
+                {
+                    await _mqttClient.ConnectAsync(_mqttClientOptions);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Connection attempt {attempt} failed: {ex}");
+                    if (attempt == maxAttempts) throw;
+                    await Task.Delay(TimeSpan.FromSeconds(2 * attempt));
+                }
+            }
+        }
 
         public async Task ConnectAsync()
         {
-            if (_mqttClient.IsConnected) return;
-
-            await _mqttClient.ConnectAsync(_mqttClientOptions);
-            
-            
-        }
-
-        public async Task SubscribeToDeviceAsync(SmartDevice device)
-        {
-            if (!_isInitialized) await InitializeAsync();
-            
-            if (_devices.TryAdd(device.UID, device))
-            {
-                var topic = $"{device.UID}/#";
-                await _mqttClient.SubscribeAsync(topic);
-            }
-        }
-        public async Task UnsubscribeFromDeviceAsync(string deviceUid)
-        {
-            if (_devices.TryRemove(deviceUid, out var device))
-            {
-                var topic = $"{device.Topic}/#";
-                await _mqttClient.UnsubscribeAsync(topic);
-                Debug.WriteLine($"Unsubscribed from device {deviceUid}");
-            }
+            if (IsConnected) return;
+            await ConnectWithRetryAsync();
         }
         public async Task DisconnectAsync()
         {
+            if (!IsConnected) return;
             await _mqttClient.DisconnectAsync();
         }
 
-        public void Dispose() =>  _mqttClient.Dispose();
-
         public async Task PublishAsync(string topic, string payload)
         {
-            if (!_isInitialized) await InitializeAsync();
+            if (!IsConnected)
+                throw new InvalidOperationException("MQTT client is not connected");
 
             var message = new MqttApplicationMessageBuilder()
                 .WithTopic(topic)
@@ -99,68 +124,128 @@ namespace Infrastructure.Services
 
         public async Task SubscribeAsync(string topic)
         {
+            if (!IsConnected)
+                throw new InvalidOperationException("MQTT client is not connected");
+
             await _mqttClient.SubscribeAsync(new MqttTopicFilterBuilder()
                 .WithTopic(topic)
                 .Build());
         }
 
-        private Task OnConnected(MqttClientConnectedEventArgs args)
-        {
-            return Task.CompletedTask;
-        }
-
-        private Task OnDisconnected(MqttClientDisconnectedEventArgs args)
-        {
-            return Task.CompletedTask;
-        }
-        private Task OnMessageRecieved(MqttApplicationMessageReceivedEventArgs args)
+        private Task OnMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs args)
         {
             try
             {
                 var payload = Encoding.UTF8.GetString(args.ApplicationMessage.Payload);
-                Debug.WriteLine($"📨 [MQTT] Топик: {args.ApplicationMessage.Topic}, Данные: {payload}");
+                var topic = args.ApplicationMessage.Topic;
 
-                var sensorData = ParseSensorData(args.ApplicationMessage.Topic, payload);
-                if (sensorData != null)
+                Debug.WriteLine($"Received MQTT message - Topic: {topic}, Payload: {payload}");
+
+                // 1. Получаем идентификатор устройства
+                var deviceId = GetDeviceIdFromTopic(topic);
+
+                // 2. Создаём или получаем объект данных для этого устройства
+                if (!_lastValues.TryGetValue(deviceId, out var sensorData))
                 {
-                    Debug.WriteLine($"🔄 Данные получены: T={sensorData.Temperature}, H={sensorData.Humidity}, P={sensorData.Pressure}");
-                    SensorDataReceived?.Invoke(this, sensorData);
+                    sensorData = new SensorData
+                    {
+                        DeviceUID = deviceId,
+                        DateTime = DateTime.UtcNow
+                    };
+                    _lastValues[deviceId] = sensorData;
                 }
+
+                // 3. Парсим данные из payload
+                var parsedData = ParseSensorData(topic, payload);
+                if (parsedData == null) return Task.CompletedTask;
+
+                // 4. Обновляем соответствующие поля в sensorData
+                if (parsedData.Temperature.HasValue)
+                {
+                    sensorData.Temperature = parsedData.Temperature;
+                    sensorData.DateTime = DateTime.UtcNow;
+                }
+                if (parsedData.Humidity.HasValue)
+                {
+                    sensorData.Humidity = parsedData.Humidity;
+                    sensorData.DateTime = DateTime.UtcNow;
+                }
+                if (parsedData.Pressure.HasValue)
+                {
+                    sensorData.Pressure = parsedData.Pressure;
+                    sensorData.DateTime = DateTime.UtcNow;
+                }
+
+                // 5. Отправляем обновленные данные
+                var dataCopy = new SensorData
+                {
+                    DeviceUID = sensorData.DeviceUID,
+                    Temperature = sensorData.Temperature,
+                    Humidity = sensorData.Humidity,
+                    Pressure = sensorData.Pressure,
+                    DateTime = sensorData.DateTime
+                };
+
+                SensorDataReceived?.Invoke(this, dataCopy);
+                Debug.WriteLine($"Processed data - Temp: {dataCopy.Temperature}, Hum: {dataCopy.Humidity}, Pres: {dataCopy.Pressure}");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"❗ Ошибка: {ex}");
+                Debug.WriteLine($"Error processing MQTT message: {ex}");
             }
+
             return Task.CompletedTask;
         }
-        private SensorData? ParseSensorData(string topic, string payload)
+
+        // Вспомогательный метод для извлечения ID устройства из топика
+        private string GetDeviceIdFromTopic(string topic)
+        {
+            var parts = topic.Split('/');
+            return parts.Length > 0 ? parts[0] : "unknown";
+        }
+
+        private SensorData ParseSensorData(string topic, string payload)
         {
 
             try
             {
-                payload = payload.Trim(); // Удаляем лишние символы
+                payload = payload.Trim();
+                var data = new SensorData();
 
-                if (topic.EndsWith("/T") && float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float temp))
+                var topicParts = topic.Split('/');
+                if (topicParts.Length != 2) return null;
+
+                string topicName = topicParts[1].ToLower();
+
+                switch (topicName)
                 {
-                    data.Temperature = temp;
-                }
-                if (topic.EndsWith("/H") && float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float humidity))
-                {
-                    data.Humidity = humidity;
-                }
-                if (topic.EndsWith("/P") && float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float pressure))
-                {
-                    data.Pressure = pressure;
+                    case "t":
+                        if (float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float temp))
+                            data.Temperature = temp;
+                        break;
+                    case "h":
+                        if (float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float humidity))
+                            data.Humidity = humidity;
+                        break;
+                    case "p":
+                        if (float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float pressure))
+                            data.Pressure = pressure;
+                        break;
                 }
 
                     return data;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Ошибка в ParseSensorData: {ex.Message}");
+                Debug.WriteLine($"Parse error: {ex}");
                 return null;
             }
         }
 
+        public void Dispose()
+        {
+            _mqttClient?.Dispose();
+            GC.SuppressFinalize(this);
+        }
     }
 }

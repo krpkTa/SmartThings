@@ -1,7 +1,6 @@
 ﻿using ApplicationLayer.Service;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 
 namespace SmartThings.ViewModels
@@ -17,7 +16,9 @@ namespace SmartThings.ViewModels
         private string _uid = string.Empty;
 
         [ObservableProperty]
-        private string _topic = string.Empty;
+        private string _deviceTopics;
+
+
 
         public AddDeviceViewModel(IDeviceService deviceService)
         {
@@ -34,8 +35,13 @@ namespace SmartThings.ViewModels
                     await Shell.Current.DisplayAlert("Error", "All fields are required", "OK");
                     return;
                 }
-
-                await _deviceService.AddDeviceAsync(Name, Uid, $"home/{Uid}/data");
+                List<string> deviceTopics = string.IsNullOrWhiteSpace(DeviceTopics)
+                    ? new List<string>()
+                    : DeviceTopics.Split(',')
+                    .Select(t => t.Trim())
+                    .Where(t => !string.IsNullOrWhiteSpace(t))
+                    .ToList();
+                await _deviceService.AddDeviceAsync(Name, Uid, deviceTopics);
                 await Shell.Current.DisplayAlert("Success", "Device added", "OK");
                 await Shell.Current.GoToAsync("//MainPage"); // Возврат на предыдущую страницу
             }

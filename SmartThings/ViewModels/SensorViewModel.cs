@@ -31,9 +31,11 @@ namespace SmartThings.ViewModels
                     DateTime = DateTime.Now
                 };
                 // Обновляем CurrentData НАПРЯМУЮ (без создания нового объекта)
-                if (newData.Temperature != 0) CurrentData.Temperature = newData.Temperature;
-                if (newData.Humidity != 0) CurrentData.Humidity = newData.Humidity;
-                if (newData.Pressure != 0) CurrentData.Pressure = newData.Pressure;
+                if (newData.Temperature.HasValue) CurrentData.Temperature = newData.Temperature;
+                if (newData.Humidity.HasValue) CurrentData.Humidity = newData.Humidity;
+                if (newData.Pressure.HasValue) CurrentData.Pressure = newData.Pressure;
+
+                CurrentData.Temperature = newData?.Temperature;
                 CurrentData.DateTime = DateTime.Now; // Обновляем время
 
                 Debug.WriteLine($"Данные: T={CurrentData.Temperature}, H={CurrentData.Humidity}, P={CurrentData.Pressure}");

@@ -11,7 +11,7 @@ namespace Domain.Models
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string UID { get; set; }
-        public string Topic { get; set; }
+        public List<string> Topics { get; set; } = new List<string>();
 
     }
 }
