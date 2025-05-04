@@ -12,7 +12,7 @@ namespace Infrastructure
             services.AddSingleton<IMqttClientService>(provider =>
             {
                 var networkService = provider.GetRequiredService<INetworkDiscoveryService>();
-                return new MqttClientService(networkService);
+                return new MqttClientService();
             });
 
             // Платформенно-специфичные сервисы

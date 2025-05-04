@@ -9,6 +9,8 @@ namespace Domain.Interfaces
         Task PublishAsync(string topic, string payload);
         Task SubscribeAsync(string topic);
         Task InitializeAsync();
+        Task SubscribeToDeviceAsync(SmartDevice device);
+        Task UnsubscribeFromDeviceAsync(string deviceUid);
 
         event EventHandler<string> MessageReceived;
         event EventHandler<SensorData> SensorDataReceived;

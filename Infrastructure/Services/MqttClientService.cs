@@ -4,33 +4,30 @@ using Domain.Interfaces;
 using Domain.Models;
 using System.Diagnostics;
 using System.Globalization;
+using System.Collections.Concurrent;
 
 namespace Infrastructure.Services
 {
     public class MqttClientService : IMqttClientService, IDisposable
     {
-        private readonly INetworkDiscoveryService _networkService;
         private  IMqttClient _mqttClient;
         private MqttClientOptions _mqttClientOptions;
+        private readonly ConcurrentDictionary<string, SmartDevice> _devices = new ConcurrentDictionary<string, SmartDevice>();
+        private bool _isInitialized;
 
         public event EventHandler<string> MessageReceived;
         public event EventHandler<SensorData> SensorDataReceived;
         SensorData data = new SensorData();
 
-        public MqttClientService(INetworkDiscoveryService networkService)
-        {
-            _networkService = networkService;
-        }
-
         public async Task InitializeAsync()
         {
-            var localIp = await _networkService.GetLocalNetworkIpAsync();
+            if (_isInitialized) return;
 
             var factory = new MqttClientFactory();
             _mqttClient = factory.CreateMqttClient();
 
             _mqttClientOptions = new MqttClientOptionsBuilder()
-                .WithTcpServer("192.168.290.119", 1883) //          Испльзуем DuckDNS вместо IP
+                .WithTcpServer("192.168.242.119", 1883)
                 .WithClientId($"SmartThingsApp{Guid.NewGuid().ToString()[..5]}")
                 .Build();
 
@@ -38,6 +35,17 @@ namespace Infrastructure.Services
             _mqttClient.DisconnectedAsync += OnDisconnected;
             _mqttClient.ApplicationMessageReceivedAsync += OnMessageRecieved;
 
+            //try
+            //{
+            //    await _mqttClient.ConnectAsync(_mqttClientOptions);
+            //    _isInitialized = true;
+
+            //}
+            //catch (Exception ex)
+            //{
+            //    Debug.WriteLine($"Initialization failed: {ex.Message}");
+
+            //}
 
         }
 
@@ -47,20 +55,29 @@ namespace Infrastructure.Services
             if (_mqttClient.IsConnected) return;
 
             await _mqttClient.ConnectAsync(_mqttClientOptions);
-            await SubscribeToSensorTopics();
+            
             
         }
 
-        private async Task SubscribeToSensorTopics()
+        public async Task SubscribeToDeviceAsync(SmartDevice device)
         {
-            await _mqttClient.SubscribeAsync("Hrodno/ESP-D6-357E/T");
-            Debug.WriteLine("Subscride Hrodno/T");
-            await _mqttClient.SubscribeAsync("Hrodno/ESP-D6-357E/H");
-            Debug.WriteLine("Subscride Hrodno/H");
-            await _mqttClient.SubscribeAsync("Hrodno/ESP-D6-357E/P");
-            Debug.WriteLine("Subscride Hrodno/P");
+            if (!_isInitialized) await InitializeAsync();
+            
+            if (_devices.TryAdd(device.UID, device))
+            {
+                var topic = $"{device.UID}/#";
+                await _mqttClient.SubscribeAsync(topic);
+            }
         }
-
+        public async Task UnsubscribeFromDeviceAsync(string deviceUid)
+        {
+            if (_devices.TryRemove(deviceUid, out var device))
+            {
+                var topic = $"{device.Topic}/#";
+                await _mqttClient.UnsubscribeAsync(topic);
+                Debug.WriteLine($"Unsubscribed from device {deviceUid}");
+            }
+        }
         public async Task DisconnectAsync()
         {
             await _mqttClient.DisconnectAsync();
@@ -70,6 +87,8 @@ namespace Infrastructure.Services
 
         public async Task PublishAsync(string topic, string payload)
         {
+            if (!_isInitialized) await InitializeAsync();
+
             var message = new MqttApplicationMessageBuilder()
                 .WithTopic(topic)
                 .WithPayload(payload)
@@ -116,32 +135,25 @@ namespace Infrastructure.Services
         }
         private SensorData? ParseSensorData(string topic, string payload)
         {
+
             try
             {
                 payload = payload.Trim(); // Удаляем лишние символы
-                
 
-                switch (topic)
+                if (topic.EndsWith("/T") && float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float temp))
                 {
-                    case "Hrodno/ESP-D6-357E/T":
-                        if (float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float temp))
-                            data.Temperature = temp;
-                        else
-                            Debug.WriteLine($"Неверный формат температуры: {payload}");
-                        break;
-
-                    case "Hrodno/ESP-D6-357E/H":
-                        if (float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float humidity))
-                            data.Humidity = humidity;
-                        break;
-
-                    case "Hrodno/ESP-D6-357E/P":
-                        if (float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float pressure))
-                            data.Pressure = pressure;
-                        break;
+                    data.Temperature = temp;
+                }
+                if (topic.EndsWith("/H") && float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float humidity))
+                {
+                    data.Humidity = humidity;
+                }
+                if (topic.EndsWith("/P") && float.TryParse(payload, NumberStyles.Float, CultureInfo.InvariantCulture, out float pressure))
+                {
+                    data.Pressure = pressure;
                 }
 
-                return data;
+                    return data;
             }
             catch (Exception ex)
             {

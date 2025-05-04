@@ -7,10 +7,13 @@ namespace SmartThings.Application.Services;
 public class DeviceService : IDeviceService
 {
     private readonly IDeviceRepository _deviceRepository;
+    private readonly IMqttClientService _mqttClientService;
+    
 
-    public DeviceService(IDeviceRepository deviceRepository)
+    public DeviceService(IDeviceRepository deviceRepository, IMqttClientService mqttClientService)
     {
         _deviceRepository = deviceRepository;
+        _mqttClientService = mqttClientService;
     }
 
     public async Task<SmartDevice> AddDeviceAsync(string name, string uid, string topic)
@@ -23,7 +26,9 @@ public class DeviceService : IDeviceService
             Topic = topic,
         };
 
-        return await _deviceRepository.AddAsync(device);
+        var addedDevice = await _deviceRepository.AddAsync(device);
+        await _mqttClientService.SubscribeToDeviceAsync(device);
+        return addedDevice;
     }
 
     public async Task<IEnumerable<SmartDevice>> GetAllDevicesAsync()
@@ -42,7 +47,7 @@ public class DeviceService : IDeviceService
         {
             var device = await _deviceRepository.GetByIdAsync(deviceId);
             if (device == null) return false;
-
+            await _mqttClientService.UnsubscribeFromDeviceAsync(deviceId.ToString());
             await _deviceRepository.DeleteAsync(device);
             return true;
         }

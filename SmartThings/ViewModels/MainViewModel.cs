@@ -1,9 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Domain.Interfaces;
+using Domain.Models;
 using Microsoft.Maui.Controls;
 using MQTTnet.Exceptions;
 using SmartThings.Views;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net.Sockets;
 
@@ -11,6 +13,7 @@ public partial class MainViewModel : ObservableObject
 {
     private readonly IMqttClientService _mqttService;
     private readonly INetworkDiscoveryService _networkService;
+    
     private bool _isInitialized = false;
 
     [ObservableProperty]
