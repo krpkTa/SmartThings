@@ -14,7 +14,7 @@
                    FontSize="24"/>
 
             <!-- Horizontal container for buttons -->
-            <HorizontalStackLayout Spacing="20" HorizontalOptions="Start" Margin="10,10,0,0">
+            <HorizontalStackLayout Spacing="20" HorizontalOptions="Start" Margin="0,0,0,0">
                 
                 <!-- First Button Card -->
                 <Frame BorderColor="#476f95"
@@ -23,7 +23,8 @@
                        WidthRequest="150"
                        HasShadow="True"
                        BackgroundColor="Transparent"
-                       Padding="0">
+                       Padding="0"
+                       Margin="10,0,0,0">
                     <Frame.Shadow>
                         <Shadow Brush="Black"
                                 Offset="3,3"
@@ -65,7 +66,7 @@
                 <!-- Second Button Card -->
                 <Frame BorderColor="#476f95"
                        CornerRadius="20"
-                       HeightRequest="93"
+                       HeightRequest="92"
                        WidthRequest="150"
                        HasShadow="True"
                        BackgroundColor="Transparent"
@@ -146,6 +147,7 @@
                     <Grid>
                         <!-- Background -->
                         <Frame CornerRadius="20"
+                               HeightRequest="109"
                                 BorderColor="Transparent"
                                 BackgroundColor="#d1dbe4"
                                 HasShadow="False"/>
@@ -188,9 +190,9 @@
 
                     <Frame.Shadow>
                         <Shadow Brush="Black"
-                                Offset="3,3"
-                                Radius="10"
-                                Opacity="0.4">
+            Offset="3,3"
+            Radius="10"
+            Opacity="0.4">
                         </Shadow>
 
                     </Frame.Shadow>
@@ -199,6 +201,7 @@
                         <!-- Background -->
                         <Frame CornerRadius="20"
                                 BorderColor="Transparent"
+                               HeightRequest="109"
                                 BackgroundColor="#d1dbe4"
                                 HasShadow="False"/>
 
@@ -248,6 +251,7 @@
                         <!-- Background -->
                         <Frame CornerRadius="20"
                                 BorderColor="Transparent"
+                               HeightRequest="109"
                                 BackgroundColor="#d1dbe4"
                                 HasShadow="False"/>
 

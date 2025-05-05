@@ -1,9 +1,12 @@
+using SmartThings.ViewModels;
+
 namespace SmartThings.Views;
 
 public partial class Pressure : ContentPage
 {
-	public Pressure()
+	public Pressure(SensorViewModel vm)
 	{
 		InitializeComponent();
+		BindingContext = vm;
 	}
 }

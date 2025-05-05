@@ -19,7 +19,7 @@
                Margin="20">
 
             <VerticalStackLayout>
-                <Label Text="{Binding CurrentData.Temperature}"
+                <Label Text="{Binding CurrentData.Temperature, StringFormat='{0:F1}°C'}"
                        FontSize="36"
                        FontAttributes="Bold"
                        TextColor="Black"

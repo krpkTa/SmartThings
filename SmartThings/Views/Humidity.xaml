@@ -2,11 +2,34 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SmartThings.Views.Humidity"
-             Title="Humidity">
+             Title="Humidity"
+             BackgroundColor="#f9f6f2">
     <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+        <Label Text="Humidity"
+           VerticalOptions="Center" 
+           HorizontalOptions="Center"
+           TextColor="Black"
+           FontSize="18"
+           FontAttributes="Bold"/>
+
+        <Frame BackgroundColor="#d1dbe4"
+           CornerRadius="20"
+           BorderColor="#476f95"
+           Padding="20"
+           Margin="20">
+
+            <VerticalStackLayout>
+                <Label Text="{Binding CurrentData.Humidity, StringFormat='{0:F1}%'}"
+                   FontSize="36"
+                   FontAttributes="Bold"
+                   TextColor="Black"
+                   HorizontalOptions="Center"/>
+
+                <Label Text="{Binding CurrentData.DateTime, StringFormat='Updated: {0:HH:mm:ss}'}"
+                   FontSize="14"
+                   TextColor="Gray"
+                   HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </Frame>
     </VerticalStackLayout>
 </ContentPage>
