@@ -26,21 +26,34 @@
                                 <Shadow Brush="Black"
                                         Offset="3,3"
                                         Radius="10"
-                                        Opacity="0.4">
-                                </Shadow>
-
+                                        Opacity="0.4"/>
                             </Frame.Shadow>
                             <Grid>
                                 <VerticalStackLayout Grid.Column="0">
                                     <Label Text="{Binding Name}" 
                                            FontSize="18"
                                            FontAttributes="Bold"/>
-                                    <Label Text="{Binding Uid}" 
+                                    <Label Text="{Binding UID}" 
                                            TextColor="#476f95"
                                            FontSize="14"/>
-                                    <Label Text="{Binding Topic}" 
+                                    <Label Text="{Binding AllTopics}" 
                                            FontSize="12"
+                                           Margin="0,0,0,0"
                                            TextColor="#666"/>
+                                    <HorizontalStackLayout>
+                                        <Button Text="On"
+                                                CornerRadius="20"
+                                                BackgroundColor="#8dcc89"
+                                                WidthRequest="100"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.TurnOnCommand}"
+                                                CommandParameter="{Binding UID}"/>
+                                        <Button Text="Off"
+                                                CornerRadius="20"
+                                                BackgroundColor="#c73b3c"
+                                                WidthRequest="100"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.TurnOffCommand}"
+                                                CommandParameter="{Binding UID}"/>
+                                    </HorizontalStackLayout>
                                 </VerticalStackLayout>
 
                                 <!-- Кнопка удаления -->
@@ -49,8 +62,8 @@
                                         TextColor="Red"
                                         FontSize="20"
                                         BackgroundColor="Transparent"
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AllDevicesViewModel}}, 
-                                                         Path=DeleteDeviceCommand}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, 
+                                                         Path=BindingContext.DeleteDeviceCommand}"
                                         CommandParameter="{Binding}"
                                         WidthRequest="50"
                                         HeightRequest="50"/>
