@@ -3,6 +3,7 @@ using Domain.Interfaces;
 using Infrastructure;
 using Infrastructure.Repositories;
 using Infrastructure.Services;
+using Microcharts.Maui;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
 using SmartThings.Application.Services;
@@ -20,6 +21,7 @@ namespace SmartThings
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMicrocharts()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -49,7 +51,6 @@ namespace SmartThings
             builder.Services.AddTransient<AddDeviceViewModel>();
             builder.Services.AddTransient<AllDevicesViewModel>();
             builder.Services.AddTransient<AllDevices>();
-            builder.Services.AddTransient<SensorPage>();
             builder.Services.AddTransient<Temperature>();
             builder.Services.AddTransient<Pressure>();
             builder.Services.AddTransient<Humidity>();

@@ -10,6 +10,7 @@ namespace Domain.Interfaces
         Task PublishAsync(string topic, string payload);
         Task SubscribeAsync(string topic);
         Task InitializeAsync();
+        Task<DeviceHistoryData> GetDeviceHistoryAsync(string uid, TimeSpan timeout);
 
         event EventHandler Connected; // Добавляем событие
         event EventHandler Disconnected;

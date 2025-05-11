@@ -1,35 +1,56 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:chart="clr-namespace:Microcharts.Maui;assembly=Microcharts.Maui"
              x:Class="SmartThings.Views.Humidity"
              Title="Humidity"
              BackgroundColor="#f9f6f2">
-    <VerticalStackLayout>
+
+    <VerticalStackLayout Spacing="20" Padding="10">
         <Label Text="Humidity"
-           VerticalOptions="Center" 
-           HorizontalOptions="Center"
-           TextColor="Black"
-           FontSize="18"
-           FontAttributes="Bold"/>
+               VerticalOptions="Start" 
+               HorizontalOptions="Center"
+               TextColor="Black"
+               FontSize="18"
+               FontAttributes="Bold"/>
 
         <Frame BackgroundColor="#d1dbe4"
-           CornerRadius="20"
-           BorderColor="#476f95"
-           Padding="20"
-           Margin="20">
-
+               CornerRadius="20"
+               BorderColor="#476f95"
+               Padding="20">
             <VerticalStackLayout>
                 <Label Text="{Binding CurrentData.Humidity, StringFormat='{0:F1}%'}"
-                   FontSize="36"
-                   FontAttributes="Bold"
-                   TextColor="Black"
-                   HorizontalOptions="Center"/>
+                       FontSize="36"
+                       FontAttributes="Bold"
+                       TextColor="Black"
+                       HorizontalOptions="Center"/>
 
                 <Label Text="{Binding CurrentData.DateTime, StringFormat='Updated: {0:HH:mm:ss}'}"
-                   FontSize="14"
-                   TextColor="Gray"
-                   HorizontalOptions="Center"/>
+                       FontSize="14"
+                       TextColor="Gray"
+                       HorizontalOptions="Center"/>
             </VerticalStackLayout>
         </Frame>
+
+        <ActivityIndicator IsRunning="{Binding IsLoading}"
+                         IsVisible="{Binding IsLoading}"
+                         Color="#476f95"/>
+
+        <!-- Сообщение об ошибке -->
+        <Label Text="{Binding ErrorMessage}"
+               IsVisible="{Binding HasError}"
+               TextColor="Red"
+               HorizontalOptions="Center"/>
+
+        <!-- График -->
+        <chart:ChartView Chart="{Binding HumidityChart}"
+                       HeightRequest="300"
+                       IsVisible="{Binding HasHistoricalData}"/>
+
+        <!-- Кнопка повтора -->
+        <Button Text="Retry Load History"
+                Command="{Binding LoadHistoryCommand}"
+                IsVisible="{Binding HasError}"
+                Margin="0,20"/>
     </VerticalStackLayout>
 </ContentPage>

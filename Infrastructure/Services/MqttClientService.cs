@@ -4,6 +4,9 @@ using Domain.Models;
 using System.Diagnostics;
 using System.Text;
 using System.Globalization;
+using System.Text.Json;
+using MQTTnet.Protocol;
+using System.Buffers;
 
 namespace Infrastructure.Services
 {
@@ -38,7 +41,7 @@ namespace Infrastructure.Services
                 _mqttClient = factory.CreateMqttClient();
 
                 _mqttClientOptions = new MqttClientOptionsBuilder()
-                    .WithTcpServer("192.168.242.119", 1883)
+                    .WithTcpServer("192.168.1.106", 1883)
                     .WithClientId($"SmartThingsApp_{Guid.NewGuid().ToString()[..5]}")
                     .Build();
 
@@ -198,6 +201,75 @@ namespace Infrastructure.Services
             }
 
             return Task.CompletedTask;
+        }
+
+        public async Task<DeviceHistoryData> GetDeviceHistoryAsync(string uid, TimeSpan timeout)
+        {
+            var responseTopic = $"devices/{uid}/history/data";
+
+            // Subscribe to response topic first
+            await _mqttClient.SubscribeAsync(responseTopic, MqttQualityOfServiceLevel.AtLeastOnce);
+
+            var tcs = new TaskCompletionSource<DeviceHistoryData>();
+            using var cts = new CancellationTokenSource(timeout);
+
+            // Proper async handler with correct signature
+            async Task Handler(MqttApplicationMessageReceivedEventArgs e)
+            {
+                try
+                {
+                    if (e.ApplicationMessage.Topic == responseTopic)
+                    {
+                        // Get payload as string (works for all MQTTnet versions)
+                        string payload;
+
+                        // For MQTTnet 4.x+
+                        if (e.ApplicationMessage.Payload.ToString() != default)
+                        {
+                            payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload.ToArray());
+                        }
+                        // For older versions
+                        else if (e.ApplicationMessage.Payload.ToString() != null)
+                        {
+                            payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
+                        }
+                        else
+                        {
+                            throw new InvalidDataException("Empty message payload");
+                        }
+
+                        var data = JsonSerializer.Deserialize<DeviceHistoryData>(payload);
+                        tcs.TrySetResult(data ?? throw new InvalidDataException("Deserialization returned null"));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    tcs.TrySetException(ex);
+                }
+            }
+
+            _mqttClient.ApplicationMessageReceivedAsync += Handler;
+
+            try
+            {
+                // Send history request
+                await _mqttClient.PublishAsync(new MqttApplicationMessageBuilder()
+                    .WithTopic($"{uid}/history/get")
+                    .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
+                    .Build());
+
+                // Wait for response with timeout
+                using (cts.Token.Register(() => tcs.TrySetCanceled()))
+                {
+                    return await tcs.Task;
+                }
+            }
+            finally
+            {
+                // Cleanup
+                _mqttClient.ApplicationMessageReceivedAsync -= Handler;
+                await _mqttClient.UnsubscribeAsync(responseTopic);
+            }
         }
 
         // Вспомогательный метод для извлечения ID устройства из топика
