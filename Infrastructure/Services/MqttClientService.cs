@@ -4,6 +4,7 @@ using Domain.Models;
 using System.Diagnostics;
 using System.Text;
 using System.Globalization;
+using System.Collections.Concurrent;
 using System.Text.Json;
 using MQTTnet.Protocol;
 using System.Buffers;
@@ -15,6 +16,8 @@ namespace Infrastructure.Services
         private readonly INetworkDiscoveryService _networkService;
         private IMqttClient _mqttClient;
         private MqttClientOptions _mqttClientOptions;
+        private readonly ConcurrentDictionary<string, SmartDevice> _devices = new ConcurrentDictionary<string, SmartDevice>();
+        private bool _isInitialized;
 
         public bool IsConnected => _mqttClient?.IsConnected ?? false;
         private readonly Dictionary<string, SensorData> _lastValues = new();
@@ -24,11 +27,6 @@ namespace Infrastructure.Services
         public event EventHandler<SensorData> SensorDataReceived;
         public event EventHandler Connected;
         public event EventHandler Disconnected;
-
-        public MqttClientService(INetworkDiscoveryService networkService)
-        {
-            _networkService = networkService;
-        }
 
         public async Task InitializeAsync()
         {
@@ -108,7 +106,6 @@ namespace Infrastructure.Services
             if (IsConnected) return;
             await ConnectWithRetryAsync();
         }
-
         public async Task DisconnectAsync()
         {
             if (!IsConnected) return;
@@ -281,6 +278,7 @@ namespace Infrastructure.Services
 
         private SensorData ParseSensorData(string topic, string payload)
         {
+
             try
             {
                 payload = payload.Trim();
@@ -307,7 +305,7 @@ namespace Infrastructure.Services
                         break;
                 }
 
-                return data;
+                    return data;
             }
             catch (Exception ex)
             {

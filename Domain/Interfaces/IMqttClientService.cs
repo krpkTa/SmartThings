@@ -10,6 +10,8 @@ namespace Domain.Interfaces
         Task PublishAsync(string topic, string payload);
         Task SubscribeAsync(string topic);
         Task InitializeAsync();
+        Task SubscribeToDeviceAsync(SmartDevice device);
+        Task UnsubscribeFromDeviceAsync(string deviceUid);
         Task<DeviceHistoryData> GetDeviceHistoryAsync(string uid, TimeSpan timeout);
 
         event EventHandler Connected; // Добавляем событие

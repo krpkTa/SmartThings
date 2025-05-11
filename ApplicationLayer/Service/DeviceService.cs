@@ -82,7 +82,7 @@ public class DeviceService : IDeviceService
         {
             var device = await _deviceRepository.GetByIdAsync(deviceId);
             if (device == null) return false;
-
+            await _mqttClientService.UnsubscribeFromDeviceAsync(deviceId.ToString());
             await _deviceRepository.DeleteAsync(device);
             return true;
         }

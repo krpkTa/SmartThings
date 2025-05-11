@@ -1,9 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Domain.Interfaces;
+using Domain.Models;
 using Microsoft.Maui.Controls;
 using MQTTnet.Exceptions;
 using SmartThings.Views;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net.Sockets;
 
